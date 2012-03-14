@@ -15,6 +15,8 @@ using EPiServer.Web.PropertyControls;
 using System.IO;
 using System.Web.UI;
 using EpiJsonPlugin;
+using System.Reflection;
+using EpiJsonPlugin.TypeMaps;
 
 
 namespace EPiServer.Plugins
@@ -22,6 +24,31 @@ namespace EPiServer.Plugins
     [PagePlugIn(DisplayName = "JSON Exporter", Description = "Exports pages as JSON")]
     public class EPiJsonPlugin
     {
+        private static IEnumerable<Type> _typeMaps;
+
+        private static void LoadTypeMaps() {
+            var assemblies = Utils.GetLoadedAssemblies();
+            var types = new List<Type>();
+
+            foreach(var assembly in assemblies) {
+                var typesInAsm = Utils.GetTypesWithTypeMapAttribute(assembly);
+                types.AddRange(typesInAsm);
+            }
+
+            _typeMaps = types;
+
+            //Activate types
+            foreach (var type in types) {
+                var instance = Activator.CreateInstance(type);
+
+                var attribs = type.GetCustomAttributes(typeof(TypeMapAttribute), true);
+
+                //Todo: also overwrite.
+                _typeMapDict.Add((attribs[0] as TypeMapAttribute).PropertyType, instance as ITypeMapTemplate);
+            }
+        }
+
+        private static Dictionary<Type, ITypeMapTemplate> _typeMapDict = new Dictionary<Type, ITypeMapTemplate>();
 
         private static Dictionary<Type, int> _typeDict = new Dictionary<Type, int>
         {
@@ -41,6 +68,7 @@ namespace EPiServer.Plugins
         public static void Initialize(int bitflags)
         {
             EPiServer.PageBase.PageSetup += PageBase_BaseSetup;
+            LoadTypeMaps();
         }
 
         static void PageBase_BaseSetup(EPiServer.PageBase sender, EPiServer.PageSetupEventArgs e)
@@ -53,7 +81,7 @@ namespace EPiServer.Plugins
 
             foreach (PropertyData prop in pd.Property)
             {
-
+                //Filter properties if told to
                 if (onlyProps != null && !onlyProps.Contains(prop.Name)) {
                     continue;
                 }

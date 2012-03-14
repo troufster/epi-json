@@ -6,11 +6,30 @@ using EPiServer.Core;
 using EPiServer.Web.PropertyControls;
 using System.IO;
 using System.Web.UI;
+using System.Reflection;
+using EpiJsonPlugin.TypeMaps;
 
 namespace EpiJsonPlugin
 {
     public static class Utils
     {
+
+        public static IEnumerable<Assembly> GetLoadedAssemblies() {
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            return loadedAssemblies;
+        }
+
+        public static IEnumerable<Type> GetTypesWithTypeMapAttribute(Assembly assembly)
+        {
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.GetCustomAttributes(typeof(TypeMapAttribute), true).Length > 0)
+                {
+                    yield return type;
+                }
+            }
+        }
         //  \b  Backspace (ascii code 08)
         //  \f  Form feed (ascii code 0C)
         //  \n  New line

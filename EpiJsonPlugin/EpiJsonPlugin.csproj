@@ -51,6 +51,16 @@
   <ItemGroup>
     <Compile Include="EPiJsonPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeMaps\PropertyDateMap.cs" />
+    <Compile Include="TypeMaps\PropertyStringMap.cs" />
+    <Compile Include="TypeMaps\PropertyPageReferenceMap.cs" />
+    <Compile Include="TypeMaps\PropertyNumberMap.cs" />
+    <Compile Include="TypeMaps\PropertyXhtmlStringMap.cs" />
+    <Compile Include="TypeMaps\PropertyLinkCollectionMap.cs" />
+    <Compile Include="TypeMaps\PropertyBooleanMap.cs" />
+    <Compile Include="TypeMaps\PropertyLongStringMap.cs" />
+    <Compile Include="TypeMaps\ITypeMapTemplate.cs" />
+    <Compile Include="TypeMaps\TypeMapAttribute.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
