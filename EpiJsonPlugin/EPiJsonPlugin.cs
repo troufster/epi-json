@@ -27,7 +27,8 @@ namespace EPiServer.Plugins
              {typeof(PropertyNumber),3},
              {typeof(PropertyPageReference),4},
              {typeof(PropertyString),5},
-             {typeof(PropertyLongString),6}
+             {typeof(PropertyLongString),6},
+             {typeof(PropertyDate),7}
 
         };
 
@@ -85,6 +86,10 @@ namespace EPiServer.Plugins
                         propval = prop.ToString();
                         break;
 
+                    case 7: //PropertyDate
+                        var d = (prop as PropertyDate).Date;
+                        propval = d != default(DateTime) ? UnixTicks((prop as PropertyDate).Date).ToString() : (-1).ToString();
+                        break;
                     default:
 
                         break;
@@ -156,6 +161,14 @@ namespace EPiServer.Plugins
             return input;
         }
 
+
+        public static double UnixTicks(DateTime dt)
+        {
+            DateTime d1 = new DateTime(1970, 1, 1);
+            DateTime d2 = dt.ToUniversalTime();
+            TimeSpan ts = new TimeSpan(d2.Ticks - d1.Ticks);
+            return ts.TotalMilliseconds;
+        }
     }
 
 }
