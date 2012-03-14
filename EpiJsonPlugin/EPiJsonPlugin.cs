@@ -24,7 +24,8 @@ namespace EPiServer.Plugins
              {typeof(PropertyBoolean),0},
              {typeof(PropertyLinkCollection),1},
              {typeof(PropertyXhtmlString),2},
-             {typeof(PropertyNumber),3}
+             {typeof(PropertyNumber),3},
+             {typeof(PropertyPageReference),4}
 
         };
 
@@ -59,6 +60,7 @@ namespace EPiServer.Plugins
 
                         propval = string.Format("\"{0}\"", (prop.Value != null).ToString());
                         break;
+
                     case 1:  //PropertyLinkCollection
                         var links = prop as PropertyLinkCollection;
                         propval = string.Format("[ {0} ]",
@@ -66,6 +68,7 @@ namespace EPiServer.Plugins
                                 l => string.Format("{{ \"href\":\"{0}\", \"text\":\"{1}\", \"target\":\"{2}\", \"title\":\"{3}\"  }}", l.Href, l.Text, l.Target, l.Title
                             ))));
                         break;
+
                     case 2:  //PropertyXhtmlString
                         propval = string.Format("\"{0}\"", EscapeStringForJs(prop.ToString()));
                         break;
@@ -73,6 +76,11 @@ namespace EPiServer.Plugins
                     case 3: //PropertyNumber
                         propval = prop.ToString();
                         break;
+
+                    case 4: //PropertyPagereference
+                        propval = prop.ToString();
+                        break;
+
                     default:
 
                         break;
