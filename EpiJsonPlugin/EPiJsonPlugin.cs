@@ -158,13 +158,13 @@ namespace EPiServer.Plugins
         //  \\  Backslash caracter
         private static string EscapeStringForJs(string input)
         {
+            input = input.Replace("\\", @"\\");
             input = input.Replace("\b", @"\b");
             input = input.Replace("\f", @"\f");
             input = input.Replace("\n", @"\n");
             input = input.Replace("\r", @"\r");
             input = input.Replace("\t", @"\t");
-            input = input.Replace("\v", @"\v");
-            input = input.Replace("\\", @"\\");
+            input = input.Replace("\v", @"\v");           
             input = input.Replace("\"", @"\""");
             input = input.Replace("\'", @"\'");
 
