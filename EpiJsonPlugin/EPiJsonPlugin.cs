@@ -48,11 +48,16 @@ namespace EPiServer.Plugins
             sender.Load += sender_Load;
         }
 
-        static void FilterPageDataProperties(PageData pd, Dictionary<string, string> dict)
+        static void FilterPageDataProperties(PageData pd, Dictionary<string, string> dict, string[] onlyProps=null)
         {
 
             foreach (PropertyData prop in pd.Property)
             {
+
+                if (onlyProps != null && !onlyProps.Contains(prop.Name)) {
+                    continue;
+                }
+
 
                 string propval = string.Empty;
                 int typeval = -1;
@@ -156,7 +161,24 @@ namespace EPiServer.Plugins
                             pages.Add(DictToJson(dict));
                         }
 
-                        json = string.Format("[ {0} ]",string.Join(",", pages));
+                        json = pages.Count > 0 ? string.Format("[ {0} ]",string.Join(",", pages)) : string.Empty;
+                        break;
+                    case "childrenids": //Page children ids only
+                         fa=new FilterAccess(EPiServer.Security.AccessLevel.Read);
+                         pdc = pb.GetChildren(pb.CurrentPageLink);
+                         pages = new List<string>();
+
+                        fa.Filter(pdc);
+
+                        foreach (var pd in pdc)
+                        {
+                            dict = new Dictionary<string, string>();
+                            FilterPageDataProperties(pd, dict, new [] {"PageLink"});
+                          
+                            pages.Add(DictToJson(dict));
+                        }
+
+                        json = pages.Count > 0 ? string.Format("[ {0} ]",string.Join(",", pages)) : string.Empty;
                         break;
                 
                 }
