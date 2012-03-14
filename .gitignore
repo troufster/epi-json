@@ -1,1 +1,3 @@
 *.cache
+EpiJsonPlugin/bin
+EpiJsonPlugin/obj
