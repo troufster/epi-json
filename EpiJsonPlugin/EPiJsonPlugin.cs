@@ -25,7 +25,9 @@ namespace EPiServer.Plugins
              {typeof(PropertyLinkCollection),1},
              {typeof(PropertyXhtmlString),2},
              {typeof(PropertyNumber),3},
-             {typeof(PropertyPageReference),4}
+             {typeof(PropertyPageReference),4},
+             {typeof(PropertyString),5},
+             {typeof(PropertyLongString),6}
 
         };
 
@@ -69,6 +71,8 @@ namespace EPiServer.Plugins
                             ))));
                         break;
 
+                    case 6:  //PropertyLongString
+                    case 5:  //PropertyString
                     case 2:  //PropertyXhtmlString
                         propval = string.Format("\"{0}\"", EscapeStringForJs(prop.ToString()));
                         break;
