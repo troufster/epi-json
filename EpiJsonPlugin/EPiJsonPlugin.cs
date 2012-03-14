@@ -10,6 +10,7 @@ using EPiServer.Core;
 using System.Text;
 using EPiServer.Filters;
 using EPiServer;
+using EPiServer.SpecializedProperties;
 
 
 namespace EPiServer.Plugins
@@ -17,6 +18,15 @@ namespace EPiServer.Plugins
     [PagePlugIn(DisplayName = "JSON Exporter", Description = "Exports pages as JSON")]
     public class EPiJsonPlugin
     {
+
+        private static Dictionary<Type, int> _typeDict = new Dictionary<Type, int>
+        {
+             {typeof(PropertyBoolean),0},
+             {typeof(PropertyLinkCollection),1},
+             {typeof(PropertyXhtmlString),2}
+        };
+
+
         public static void Initialize(int bitflags)
         {
             EPiServer.PageBase.PageSetup += PageBase_BaseSetup;
@@ -32,14 +42,43 @@ namespace EPiServer.Plugins
 
             foreach (PropertyData prop in pd.Property)
             {
-                //TODO: Handle all epi types properly
-                dict.Add(prop.Name, prop.ToString());
+
+                string propval = string.Empty;
+                int typeval = -1;
+
+                if (!_typeDict.TryGetValue(prop.GetType(), out typeval))
+                    continue;
+
+                switch (typeval)
+                {
+                    case 0:  //PropertyBoolean
+
+                        propval = string.Format("\"{0}\"", (prop.Value != null).ToString());
+                        break;
+                    case 1:  //PropertyLinkCollection
+                        var links = prop as PropertyLinkCollection;
+                        propval = string.Format("[ {0} ]",
+                            string.Join(",", links.Select(
+                                l => string.Format("{{ \"href\":\"{0}\", \"text\":\"{1}\", \"target\":\"{2}\", \"title\":\"{3}\"  }}", l.Href, l.Text, l.Target, l.Title
+                            ))));
+                        break;
+                    case 2:  //PropertyXhtmlString
+                        propval = string.Format("\"{0}\"", HttpUtility.HtmlEncode(prop.ToString()));
+                        break;
+                    default:
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(propval))
+                {
+                    dict.Add(prop.Name, propval);
+                }
             }
         }
 
         static string DictToJson(Dictionary<string, string> dict)
         {
-            var contents = string.Join(",", dict.Select(d => string.Format("\"{0}\" : \"{1}\"", d.Key, d.Value)));
+            var contents = string.Join(",", dict.Select(d => string.Format("\"{0}\" : {1}", d.Key, d.Value)));
             return String.Format("{{ {0} }}", contents);
         }
 

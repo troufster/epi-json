@@ -1,3 +1,4 @@
 *.cache
 EpiJsonPlugin/bin
 EpiJsonPlugin/obj
+EpiJsonPlugin/EpiJsonPlugin.suo
