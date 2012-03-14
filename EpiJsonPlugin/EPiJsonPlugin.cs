@@ -129,18 +129,38 @@ namespace EPiServer.Plugins
             {
                 //Parse option
                 var option = pb.Request["json"].ToLower();
+                string json = string.Empty;
 
-                //Todo: switch options properly
+                switch (option) { 
+                    case "current": //Current page only                     
+                        var dict = new Dictionary<string, string>();
 
-                //Return current page as JSON
-                var dict = new Dictionary<string, string>();
+                        FilterPageDataProperties(pb.CurrentPage, dict);
 
-                FilterPageDataProperties(pb.CurrentPage, dict);
+                        //Convert to json
+                        json = DictToJson(dict);
+                        break;
 
-                //Convert to json
-                var json = DictToJson(dict);
+                    case "children": //Page children
+                        var fa=new FilterAccess(EPiServer.Security.AccessLevel.Read);
+                        var pdc = pb.GetChildren(pb.CurrentPageLink);
+                        var pages = new List<string>();
 
-                //pb.Response.Headers.Add("Content-type", "application/json");
+                        fa.Filter(pdc);
+
+                        foreach (var pd in pdc)
+                        {
+                            dict = new Dictionary<string, string>();
+                            FilterPageDataProperties(pd, dict);
+                          
+                            pages.Add(DictToJson(dict));
+                        }
+
+                        json = string.Format("[ {0} ]",string.Join(",", pages));
+                        break;
+                
+                }
+
                 pb.Response.ContentType = "application/json";
                 pb.Response.Write(json);
                 pb.Response.End();
