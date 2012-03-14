@@ -11,6 +11,9 @@ using System.Text;
 using EPiServer.Filters;
 using EPiServer;
 using EPiServer.SpecializedProperties;
+using EPiServer.Web.PropertyControls;
+using System.IO;
+using System.Web.UI;
 
 
 namespace EPiServer.Plugins
@@ -75,7 +78,15 @@ namespace EPiServer.Plugins
                     case 6:  //PropertyLongString
                     case 5:  //PropertyString
                     case 2:  //PropertyXhtmlString
-                        propval = string.Format("\"{0}\"", EscapeStringForJs(prop.ToString()));
+
+                        var propstr = prop.ToString();
+                        //Render dynamic content
+                        if (typeval == 2)
+                        {
+                            propstr = ParseHtmlProperty(prop as PropertyData);
+                        }
+
+                        propval = string.Format("\"{0}\"", EscapeStringForJs(propstr));
                         break;
 
                     case 3: //PropertyNumber
@@ -168,6 +179,31 @@ namespace EPiServer.Plugins
             DateTime d2 = dt.ToUniversalTime();
             TimeSpan ts = new TimeSpan(d2.Ticks - d1.Ticks);
             return ts.TotalMilliseconds;
+        }
+
+        //http://tedgustaf.com/en/blog/2009/9/parse-an-episerver-xhtml-property-with-dynamic-content/
+        public static string ParseHtmlProperty(PropertyData propertydata)
+        {
+            // Create a Property control which will parse the XHTML value for us
+            var ctrl = new PropertyLongStringControl();
+
+            // Set the PropertyData to the property we want to parse
+            ctrl.PropertyData = propertydata;
+
+            // Initialize the Property control
+            ctrl.SetupControl();
+
+            // Create a string writer...
+            var sw = new StringWriter();
+
+            // ...and an HtmlTextWriter using that string writer
+            var htw = new HtmlTextWriter(sw);
+
+            // Render the Property control to get the markup
+            ctrl.RenderControl(htw);
+
+            // Return the parsed markup
+            return sw.ToString();
         }
     }
 
