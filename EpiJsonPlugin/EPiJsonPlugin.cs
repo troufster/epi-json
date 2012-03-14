@@ -23,9 +23,12 @@ namespace EPiServer.Plugins
         {
              {typeof(PropertyBoolean),0},
              {typeof(PropertyLinkCollection),1},
-             {typeof(PropertyXhtmlString),2}
+             {typeof(PropertyXhtmlString),2},
+             {typeof(PropertyNumber),3}
+
         };
 
+        private static string[] _privateProps = { };
 
         public static void Initialize(int bitflags)
         {
@@ -46,6 +49,7 @@ namespace EPiServer.Plugins
                 string propval = string.Empty;
                 int typeval = -1;
 
+
                 if (!_typeDict.TryGetValue(prop.GetType(), out typeval))
                     continue;
 
@@ -63,9 +67,14 @@ namespace EPiServer.Plugins
                             ))));
                         break;
                     case 2:  //PropertyXhtmlString
-                        propval = string.Format("\"{0}\"", HttpUtility.HtmlEncode(prop.ToString()));
+                        propval = string.Format("\"{0}\"", EscapeStringForJs(prop.ToString()));
+                        break;
+
+                    case 3: //PropertyNumber
+                        propval = prop.ToString();
                         break;
                     default:
+
                         break;
                 }
 
@@ -102,12 +111,39 @@ namespace EPiServer.Plugins
                 //Convert to json
                 var json = DictToJson(dict);
 
-                pb.Response.Headers.Add("Content-type", "application/json");
+                //pb.Response.Headers.Add("Content-type", "application/json");
+                pb.Response.ContentType = "application/json";
                 pb.Response.Write(json);
                 pb.Response.End();
 
             }
         }
 
+        //  \b  Backspace (ascii code 08)
+        //  \f  Form feed (ascii code 0C)
+        //  \n  New line
+        //  \r  Carriage return
+        //  \t  Tab
+        //  \v  Vertical tab
+        //  \'  Apostrophe or single quote
+        //  \"  Double quote
+        //  \\  Backslash caracter
+        private static string EscapeStringForJs(string input)
+        {
+            input = input.Replace("\b", @"\b");
+            input = input.Replace("\f", @"\f");
+            input = input.Replace("\n", @"\n");
+            input = input.Replace("\r", @"\r");
+            input = input.Replace("\t", @"\t");
+            input = input.Replace("\v", @"\v");
+            input = input.Replace("\\", @"\\");
+            input = input.Replace("\"", @"\""");
+            input = input.Replace("\'", @"\'");
+
+
+            return input;
+        }
+
     }
+
 }
