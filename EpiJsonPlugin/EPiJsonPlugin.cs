@@ -17,6 +17,7 @@ using System.Web.UI;
 using EpiJsonPlugin;
 using System.Reflection;
 using EpiJsonPlugin.TypeMaps;
+using EpiJsonPlugin.Commands;
 
 
 namespace EPiServer.Plugins
@@ -31,7 +32,7 @@ namespace EPiServer.Plugins
             var types = new List<Type>();
 
             foreach(var assembly in assemblies) {
-                var typesInAsm = Utils.GetTypesWithTypeMapAttribute(assembly);
+                var typesInAsm = Utils.GetTypesWithAttribute<TypeMapAttribute>(assembly);
                 types.AddRange(typesInAsm);
             }
 
@@ -42,12 +43,42 @@ namespace EPiServer.Plugins
                 var instance = Activator.CreateInstance(type);
 
                 var attribs = type.GetCustomAttributes(typeof(TypeMapAttribute), true);
-
-                //Todo: also overwrite.
-                _typeMapDict.Add((attribs[0] as TypeMapAttribute).PropertyType, instance as ITypeMapTemplate);
+                var propertyType = (attribs[0] as TypeMapAttribute).PropertyType;
+               
+                //Overwrite type map redeclarations
+                if (_typeMapDict.ContainsKey(propertyType)) {
+                    _typeMapDict.Remove(propertyType);
+                }
+                
+                _typeMapDict.Add(propertyType, instance as ITypeMapTemplate);
             }
         }
 
+        private static void LoadCommands() {
+            var assemblies = Utils.GetLoadedAssemblies();
+            var types = new List<Type>();
+
+            foreach (var assembly in assemblies) {
+                var typesInAsm = Utils.GetTypesWithAttribute<CommandAttribute>(assembly);
+                types.AddRange(typesInAsm);
+            }
+
+            //Activate types
+            foreach (var type in types) {
+                var instance = Activator.CreateInstance(type);
+
+                var attribs = type.GetCustomAttributes(typeof(CommandAttribute), true);
+                var cmdName = (attribs[0] as CommandAttribute).CommandName;
+                
+                //Overwrite redeclaration of cmdname
+                if(_commandDict.ContainsKey(cmdName)) {
+                    _commandDict.Remove(cmdName);
+                }
+                _commandDict.Add(cmdName, instance as ICommandTemplate);
+            }
+        }
+
+        private static Dictionary<string, ICommandTemplate> _commandDict = new Dictionary<string, ICommandTemplate>(); 
         private static Dictionary<Type, ITypeMapTemplate> _typeMapDict = new Dictionary<Type, ITypeMapTemplate>();
 
         private static string[] _privateProps = { };
@@ -56,12 +87,15 @@ namespace EPiServer.Plugins
         {
             EPiServer.PageBase.PageSetup += PageBase_BaseSetup;
             LoadTypeMaps();
+            LoadCommands();
         }
 
         static void PageBase_BaseSetup(EPiServer.PageBase sender, EPiServer.PageSetupEventArgs e)
         {
             sender.Load += sender_Load;
         }
+
+
 
         static void FilterPageDataProperties(PageData pd, Dictionary<string, string> dict, string[] onlyProps=null)
         {
@@ -102,55 +136,24 @@ namespace EPiServer.Plugins
             if (!string.IsNullOrEmpty(pb.Request["json"]))
             {
                 //Parse option
-                var option = pb.Request["json"].ToLower();
+                var command = pb.Request["json"].ToLower();
                 string json = string.Empty;
 
-                switch (option) { 
-                    case "current": //Current page only                     
-                        var dict = new Dictionary<string, string>();
+                ICommandTemplate cmd;
 
-                        FilterPageDataProperties(pb.CurrentPage, dict);
+                if (!_commandDict.TryGetValue(command, out cmd)) pb.Response.End();
 
-                        //Convert to json
-                        json = DictToJson(dict);
-                        break;
+                var commandSelection = cmd.ExecuteCommand(pb);
+                var filter = cmd.GetPropertyFilter();
+                var pages = new List<string>();
 
-                    case "children": //Page children
-                        var fa=new FilterAccess(EPiServer.Security.AccessLevel.Read);
-                        var pdc = pb.GetChildren(pb.CurrentPageLink);
-                        var pages = new List<string>();
-
-                        fa.Filter(pdc);
-
-                        foreach (var pd in pdc)
-                        {
-                            dict = new Dictionary<string, string>();
-                            FilterPageDataProperties(pd, dict);
-                          
-                            pages.Add(DictToJson(dict));
-                        }
-
-                        json = pages.Count > 0 ? string.Format("[ {0} ]",string.Join(",", pages)) : string.Empty;
-                        break;
-                    case "childrenids": //Page children ids only
-                         fa=new FilterAccess(EPiServer.Security.AccessLevel.Read);
-                         pdc = pb.GetChildren(pb.CurrentPageLink);
-                         pages = new List<string>();
-
-                        fa.Filter(pdc);
-
-                        foreach (var pd in pdc)
-                        {
-                            dict = new Dictionary<string, string>();
-                            FilterPageDataProperties(pd, dict, new [] {"PageLink"});
-                          
-                            pages.Add(DictToJson(dict));
-                        }
-
-                        json = pages.Count > 0 ? string.Format("[ {0} ]",string.Join(",", pages)) : string.Empty;
-                        break;
-                
+                foreach (var page in commandSelection) {
+                    var dict = new Dictionary<string, string>();
+                    FilterPageDataProperties(page, dict, filter);
+                    pages.Add(DictToJson(dict));
                 }
+
+                json = pages.Count > 1 ? string.Format("[ {0} ]", string.Join(",", pages)) : pages.FirstOrDefault();
 
                 pb.Response.ContentType = "application/json";
                 pb.Response.Write(json);

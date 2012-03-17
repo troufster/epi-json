@@ -8,6 +8,7 @@ using System.IO;
 using System.Web.UI;
 using System.Reflection;
 using EpiJsonPlugin.TypeMaps;
+using EpiJsonPlugin.Commands;
 
 namespace EpiJsonPlugin
 {
@@ -20,16 +21,18 @@ namespace EpiJsonPlugin
             return loadedAssemblies;
         }
 
-        public static IEnumerable<Type> GetTypesWithTypeMapAttribute(Assembly assembly)
+        public static IEnumerable<Type> GetTypesWithAttribute<T>(Assembly assembly)
         {
             foreach (Type type in assembly.GetTypes())
             {
-                if (type.GetCustomAttributes(typeof(TypeMapAttribute), true).Length > 0)
+                if (type.GetCustomAttributes(typeof(T), true).Length > 0)
                 {
                     yield return type;
                 }
             }
         }
+
+      
         //  \b  Backspace (ascii code 08)
         //  \f  Form feed (ascii code 0C)
         //  \n  New line

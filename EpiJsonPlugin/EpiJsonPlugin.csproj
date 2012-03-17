@@ -49,6 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ChildPageIdCommand.cs" />
+    <Compile Include="Commands\ChildPagesCommand.cs" />
+    <Compile Include="Commands\CommandAttribute.cs" />
+    <Compile Include="Commands\CurrentPageCommand.cs" />
+    <Compile Include="Commands\ICommandTemplate.cs" />
     <Compile Include="EPiJsonPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeMaps\PropertyDateMap.cs" />
