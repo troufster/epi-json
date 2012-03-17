@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Globalization;
 using EPiServer.Core;
 
 namespace EpiJsonPlugin.TypeMaps
@@ -9,10 +7,16 @@ namespace EpiJsonPlugin.TypeMaps
     [TypeMap(PropertyType = typeof(PropertyDate))]
     public class PropertyDateMap : ITypeMapTemplate
     {
-        public string Map(EPiServer.Core.PageData pageData, EPiServer.Core.PropertyData propertyData)
+        public string Map(PageData pageData, PropertyData propertyData)
         {
-           var d = (propertyData as PropertyDate).Date;
-           return d != default(DateTime) ? Utils.UnixTicks(d).ToString() : (-1).ToString();           
+            var propertyDate = propertyData as PropertyDate;
+            if (propertyDate != null)
+            {
+                var d = propertyDate.Date;
+                return d != default(DateTime) ? Utils.UnixTicks(d).ToString(CultureInfo.InvariantCulture) : (-1).ToString(CultureInfo.InvariantCulture);
+            }
+
+            return string.Empty;
         }
     }
 }

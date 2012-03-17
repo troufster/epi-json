@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using EPiServer.Core;
 using EPiServer.Filters;
 using EPiServer;
@@ -15,7 +12,6 @@ namespace EpiJsonPlugin.Commands
         {
             var fa = new FilterAccess(EPiServer.Security.AccessLevel.Read);
             var pdc = currentPage.GetChildren(currentPage.CurrentPageLink);
-            var pages = new List<string>();
 
             fa.Filter(pdc);
 

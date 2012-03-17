@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using EPiServer.Core;
+﻿using EPiServer.Core;
 using EPiServer.SpecializedProperties;
 
 namespace EpiJsonPlugin.TypeMaps
@@ -10,9 +6,9 @@ namespace EpiJsonPlugin.TypeMaps
     [TypeMap(PropertyType = typeof(PropertyXhtmlString))]
     public class PropertyXhtmlStringMap : ITypeMapTemplate
     {
-        public string Map(EPiServer.Core.PageData pageData, EPiServer.Core.PropertyData propertyData)
+        public string Map(PageData pageData, PropertyData propertyData)
         {         
-            var propstr = Utils.ParseHtmlProperty(propertyData as PropertyData);          
+            var propstr = Utils.ParseHtmlProperty(propertyData);          
 
             return string.Format("\"{0}\"", Utils.EscapeStringForJs(propstr));            
         }

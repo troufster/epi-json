@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using EPiServer.Core;
 using EPiServer.Web.PropertyControls;
 using System.IO;
 using System.Web.UI;
 using System.Reflection;
-using EpiJsonPlugin.TypeMaps;
-using EpiJsonPlugin.Commands;
 
 namespace EpiJsonPlugin
 {
@@ -23,16 +20,10 @@ namespace EpiJsonPlugin
 
         public static IEnumerable<Type> GetTypesWithAttribute<T>(Assembly assembly)
         {
-            foreach (Type type in assembly.GetTypes())
-            {
-                if (type.GetCustomAttributes(typeof(T), true).Length > 0)
-                {
-                    yield return type;
-                }
-            }
+            return assembly.GetTypes().Where(type => type.GetCustomAttributes(typeof(T), true).Length > 0);
         }
 
-      
+
         //  \b  Backspace (ascii code 08)
         //  \f  Form feed (ascii code 0C)
         //  \n  New line
@@ -59,9 +50,9 @@ namespace EpiJsonPlugin
 
         public static double UnixTicks(DateTime dt)
         {
-            DateTime d1 = new DateTime(1970, 1, 1);
-            DateTime d2 = dt.ToUniversalTime();
-            TimeSpan ts = new TimeSpan(d2.Ticks - d1.Ticks);
+            var d1 = new DateTime(1970, 1, 1);
+            var d2 = dt.ToUniversalTime();
+            var ts = new TimeSpan(d2.Ticks - d1.Ticks);
             return ts.TotalMilliseconds;
         }
 
@@ -69,10 +60,9 @@ namespace EpiJsonPlugin
         public static string ParseHtmlProperty(PropertyData propertydata)
         {
             // Create a Property control which will parse the XHTML value for us
-            var ctrl = new PropertyLongStringControl();
+            var ctrl = new PropertyLongStringControl {PropertyData = propertydata};
 
             // Set the PropertyData to the property we want to parse
-            ctrl.PropertyData = propertydata;
 
             // Initialize the Property control
             ctrl.SetupControl();

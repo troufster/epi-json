@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using EPiServer.Core;
 using EPiServer;
 
@@ -12,9 +9,7 @@ namespace EpiJsonPlugin.Commands
     {
         public IEnumerable<PageData> ExecuteCommand(PageBase currentPage)
         {
-            var pageList = new List<PageData>();
-
-            pageList.Add(currentPage.CurrentPage);
+            var pageList = new List<PageData> {currentPage.CurrentPage};
 
             return pageList;
         }

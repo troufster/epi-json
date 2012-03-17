@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Globalization;
 using EPiServer.Core;
 
 namespace EpiJsonPlugin.TypeMaps
@@ -9,9 +6,9 @@ namespace EpiJsonPlugin.TypeMaps
     [TypeMap(PropertyType = typeof(PropertyBoolean))]
     public class PropertyBooleanMap : ITypeMapTemplate
     {
-        public string Map(EPiServer.Core.PageData pageData, EPiServer.Core.PropertyData propertyData)
+        public string Map(PageData pageData, PropertyData propertyData)
         {
-            return string.Format("\"{0}\"", (propertyData.Value != null).ToString());
+            return string.Format("\"{0}\"", (propertyData.Value != null).ToString(CultureInfo.InvariantCulture));
         }
     }
 }
