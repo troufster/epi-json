@@ -50,19 +50,6 @@ namespace EPiServer.Plugins
 
         private static Dictionary<Type, ITypeMapTemplate> _typeMapDict = new Dictionary<Type, ITypeMapTemplate>();
 
-        private static Dictionary<Type, int> _typeDict = new Dictionary<Type, int>
-        {
-             {typeof(PropertyBoolean),0},
-             {typeof(PropertyLinkCollection),1},
-             {typeof(PropertyXhtmlString),2},
-             {typeof(PropertyNumber),3},
-             {typeof(PropertyPageReference),4},
-             {typeof(PropertyString),5},
-             {typeof(PropertyLongString),6},
-             {typeof(PropertyDate),7}
-
-        };
-
         private static string[] _privateProps = { };
 
         public static void Initialize(int bitflags)
