@@ -11,7 +11,7 @@ namespace EpiJsonPlugin.TypeMaps
     {
         public string Map(EPiServer.Core.PageData pageData, EPiServer.Core.PropertyData propertyData)
         {
-            throw new NotImplementedException();
+            return string.Format("\"{0}\"", (propertyData.Value != null).ToString());
         }
     }
 }

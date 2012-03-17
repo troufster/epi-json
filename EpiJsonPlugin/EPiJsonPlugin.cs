@@ -81,65 +81,18 @@ namespace EPiServer.Plugins
 
             foreach (PropertyData prop in pd.Property)
             {
-                //Filter properties if told to
+                //Filter out properties if told to
                 if (onlyProps != null && !onlyProps.Contains(prop.Name)) {
                     continue;
                 }
 
+                ITypeMapTemplate mapTemplate;
+
+                if (!_typeMapDict.TryGetValue(prop.GetType(), out mapTemplate)) continue;
 
                 string propval = string.Empty;
-                int typeval = -1;
-
-
-                if (!_typeDict.TryGetValue(prop.GetType(), out typeval))
-                    continue;
-
-                switch (typeval)
-                {
-                    case 0:  //PropertyBoolean
-
-                        propval = string.Format("\"{0}\"", (prop.Value != null).ToString());
-                        break;
-
-                    case 1:  //PropertyLinkCollection
-                        var links = prop as PropertyLinkCollection;
-                        propval = string.Format("[ {0} ]",
-                            string.Join(",", links.Select(
-                                l => string.Format("{{ \"href\":\"{0}\", \"text\":\"{1}\", \"target\":\"{2}\", \"title\":\"{3}\"  }}", l.Href, l.Text, l.Target, l.Title
-                            ))));
-                        break;
-
-                    case 6:  //PropertyLongString
-                    case 5:  //PropertyString
-                    case 2:  //PropertyXhtmlString
-
-                        var propstr = prop.ToString();
-                        //Render dynamic content
-                        if (typeval == 2)
-                        {
-                            propstr = Utils.ParseHtmlProperty(prop as PropertyData);
-                        }
-
-                        propval = string.Format("\"{0}\"", Utils.EscapeStringForJs(propstr));
-                        break;
-
-                    case 3: //PropertyNumber
-                        propval = prop.ToString();
-                        break;
-
-                    case 4: //PropertyPagereference
-                        propval = prop.ToString();
-                        break;
-
-                    case 7: //PropertyDate
-                        var d = (prop as PropertyDate).Date;
-                        propval = d != default(DateTime) ? Utils.UnixTicks((prop as PropertyDate).Date).ToString() : (-1).ToString();
-                        break;
-                    default:
-
-                        break;
-                }
-
+                propval = mapTemplate.Map(pd, prop);
+            
                 if (!string.IsNullOrEmpty(propval))
                 {
                     dict.Add(prop.Name, propval);
@@ -157,6 +110,7 @@ namespace EPiServer.Plugins
         {
             var pb = sender as PageBase;
 
+            //Todo: allow definition of command listeners by plugins
             //Check if json was requested
             if (!string.IsNullOrEmpty(pb.Request["json"]))
             {

@@ -11,8 +11,10 @@ namespace EpiJsonPlugin.TypeMaps
     public class PropertyXhtmlStringMap : ITypeMapTemplate
     {
         public string Map(EPiServer.Core.PageData pageData, EPiServer.Core.PropertyData propertyData)
-        {
-            throw new NotImplementedException();
+        {         
+            var propstr = Utils.ParseHtmlProperty(propertyData as PropertyData);          
+
+            return string.Format("\"{0}\"", Utils.EscapeStringForJs(propstr));            
         }
     }
 }
