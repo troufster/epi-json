@@ -56,6 +56,15 @@
     <Compile Include="Commands\ICommandTemplate.cs" />
     <Compile Include="EPiJsonPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeMaps\PropertyXFormMap.cs" />
+    <Compile Include="TypeMaps\PropertyWeekDayMap.cs" />
+    <Compile Include="TypeMaps\PropertyWebPartMap.cs" />
+    <Compile Include="TypeMaps\PropertyVirtualLinkMap.cs" />
+    <Compile Include="TypeMaps\PropertyDocumentUrlMap.cs" />
+    <Compile Include="TypeMaps\PropertyUILanguageMap.cs" />
+    <Compile Include="TypeMaps\PropertySortOrder.cs" />
+    <Compile Include="TypeMaps\PropertyCheckBoxListMap.cs" />
+    <Compile Include="TypeMaps\PropertyListMap.cs" />
     <Compile Include="TypeMaps\PropertyPasswordMap.cs" />
     <Compile Include="TypeMaps\PropertyPagetypeMap.cs" />
     <Compile Include="TypeMaps\PropertyLanguageBranchMap.cs" />
