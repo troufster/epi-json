@@ -25,8 +25,9 @@ namespace EpiJsonPlugin
             }
         }
 
-      
-
+        /// <summary>
+        /// Loads all types having the TypeMap Attribute from loaded assemblies
+        /// </summary>
         private static void LoadTypeMaps()
         {
             var assemblies = Utils.GetLoadedAssemblies();
@@ -58,6 +59,9 @@ namespace EpiJsonPlugin
             }
         }
 
+        /// <summary>
+        /// Loads all types having the Command attribute from loaded assemblies
+        /// </summary>
         private static void LoadCommands()
         {
             var assemblies = Utils.GetLoadedAssemblies();
@@ -87,7 +91,10 @@ namespace EpiJsonPlugin
             }
         }
 
+        //Loaded commands
         private static readonly Dictionary<string, ICommandTemplate> CommandDict = new Dictionary<string, ICommandTemplate>();
+        
+        //Loaded type maps
         private static readonly Dictionary<Type, ITypeMapTemplate> TypeMapDict = new Dictionary<Type, ITypeMapTemplate>();
 
         public static void Initialize(int bitflags)
@@ -100,19 +107,16 @@ namespace EpiJsonPlugin
             sender.Load += SenderLoad;
         }
 
-
-
-        static void FilterPageDataProperties(PageData pd, Dictionary<string, string> dict, string[] onlyProps = null)
+        /// <summary>
+        /// Generates JSON key-value pairs
+        /// </summary>
+        /// <param name="pd">Page to be serialized</param>
+        /// <param name="dict">Dictionary to fill with values</param>
+        /// <param name="onlyProps">Only serialized these properties if provided</param>
+        static void FilterPageDataProperties(PageData pd, IDictionary<string, string> dict, string[] onlyProps = null)
         {
-
-            foreach (PropertyData prop in pd.Property)
+            foreach (var prop in pd.Property.Where(prop => onlyProps == null || onlyProps.Contains(prop.Name)))
             {
-                //Filter out properties if told to
-                if (onlyProps != null && !onlyProps.Contains(prop.Name))
-                {
-                    continue;
-                }
-
                 ITypeMapTemplate mapTemplate;
 
                 if (!TypeMapDict.TryGetValue(prop.GetType(), out mapTemplate)) continue;
@@ -126,6 +130,11 @@ namespace EpiJsonPlugin
             }
         }
 
+        /// <summary>
+        /// Creates a JSON string from a Dictionary
+        /// </summary>
+        /// <param name="dict">Dictionary to serialize</param>
+        /// <returns>A JSON string</returns>
         static string DictToJson(Dictionary<string, string> dict)
         {
             var contents = string.Join(",", dict.Select(d => string.Format("\"{0}\" : {1}", d.Key, d.Value)));
@@ -136,29 +145,34 @@ namespace EpiJsonPlugin
         {
             var pb = sender as PageBase;
 
-
             if (pb == null) return;
+
             //Check if json was requested
             if (string.IsNullOrEmpty(pb.Request["json"])) return;
 
-            //Parse option
-
+            //get command
             var command = pb.Request["json"].ToLower();
 
             ICommandTemplate cmd;
 
+            //Try to find a handler for provided command
             if (!CommandDict.TryGetValue(command, out cmd)) { 
+                //End response if no handler found
                 pb.Response.End();
                 return;
             }
 
+            //Handler found but no instance registered (occurs when not implementing ICommandTemplate interface properly)
             if(cmd == null)
             {
                 throw new InvalidOperationException(string.Format("Could not load handler for command {0}",command));
             }
 
+            //Execute command
             var commandSelection = cmd.ExecuteCommand(pb);
             var filter = cmd.GetPropertyFilter();
+
+            //Process command result
             var pages = new List<string>();
 
             foreach (var page in commandSelection)
@@ -168,8 +182,10 @@ namespace EpiJsonPlugin
                 pages.Add(DictToJson(dict));
             }
 
+            //If multiple pages, wrap in array
             var json = pages.Count > 1 ? string.Format("[ {0} ]", string.Join(",", pages)) : pages.FirstOrDefault();
 
+            //Return json
             pb.Response.ContentType = "application/json";
             pb.Response.Write(json ?? string.Empty);
 
