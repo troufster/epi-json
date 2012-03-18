@@ -15,24 +15,25 @@ namespace EpiJsonPlugin
     [PagePlugIn(DisplayName = "JSON Exporter", Description = "Exports pages as JSON")]
     public class EPiJsonPlugin
     {
-        private static readonly object _lock = new object();
+        private static readonly object Lock = new object();
 
         static EPiJsonPlugin()
         {
-            lock(_lock) {
+            lock(Lock) {
                 LoadTypeMaps();
                 LoadCommands();
             }
         }
+
+      
 
         private static void LoadTypeMaps()
         {
             var assemblies = Utils.GetLoadedAssemblies();
             var types = new List<Type>();
 
-            foreach (var assembly in assemblies)
+            foreach (var typesInAsm in assemblies.Select(Utils.GetTypesWithAttribute<TypeMapAttribute>))
             {
-                var typesInAsm = Utils.GetTypesWithAttribute<TypeMapAttribute>(assembly);
                 types.AddRange(typesInAsm);
             }
 
@@ -44,6 +45,7 @@ namespace EpiJsonPlugin
                 var attribs = type.GetCustomAttributes(typeof(TypeMapAttribute), true);
                 var typeMapAttribute = attribs[0] as TypeMapAttribute;
                 if (typeMapAttribute == null) continue;
+
                 var propertyType = typeMapAttribute.PropertyType;
 
                 //Overwrite type map redeclarations
@@ -61,9 +63,8 @@ namespace EpiJsonPlugin
             var assemblies = Utils.GetLoadedAssemblies();
             var types = new List<Type>();
 
-            foreach (var assembly in assemblies)
+            foreach (var typesInAsm in assemblies.Select(Utils.GetTypesWithAttribute<CommandAttribute>))
             {
-                var typesInAsm = Utils.GetTypesWithAttribute<CommandAttribute>(assembly);
                 types.AddRange(typesInAsm);
             }
 
