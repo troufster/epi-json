@@ -113,7 +113,7 @@ namespace EpiJsonPlugin
         /// <param name="pd">Page to be serialized</param>
         /// <param name="dict">Dictionary to fill with values</param>
         /// <param name="onlyProps">Only serialized these properties if provided</param>
-        static void FilterPageDataProperties(PageData pd, IDictionary<string, string> dict, string[] onlyProps = null)
+        static void FilterPageDataProperties(PageData pd, IDictionary<string, string> dict, IEnumerable<string> onlyProps = null)
         {
             foreach (var prop in pd.Property.Where(prop => onlyProps == null || onlyProps.Contains(prop.Name)))
             {
@@ -121,7 +121,7 @@ namespace EpiJsonPlugin
 
                 if (!TypeMapDict.TryGetValue(prop.GetType(), out mapTemplate)) continue;
 
-                //Handler found but no instance registered (occurs when not implementing ICommandTemplate interface properly)
+                //Handler found but no instance registered (occurs when not implementing ITypeMapTemplate interface properly)
                 if (mapTemplate == null)
                 {
                     throw new InvalidOperationException(string.Format("Could not load map for type {0}, make sure type maps inherit from ITypeMapTemplate", prop.GetType()));

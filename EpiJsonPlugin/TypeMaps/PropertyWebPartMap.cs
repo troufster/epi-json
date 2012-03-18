@@ -1,5 +1,4 @@
 ﻿using EPiServer.Core;
-using EPiServer.SpecializedProperties;
 using EPiServer.WebParts.Core;
 
 namespace EpiJsonPlugin.TypeMaps

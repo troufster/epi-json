@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using EPiServer.Core;
+﻿using EPiServer.Core;
 
 namespace EpiJsonPlugin.TypeMaps
 {
