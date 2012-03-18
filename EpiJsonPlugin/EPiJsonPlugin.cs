@@ -121,6 +121,12 @@ namespace EpiJsonPlugin
 
                 if (!TypeMapDict.TryGetValue(prop.GetType(), out mapTemplate)) continue;
 
+                //Handler found but no instance registered (occurs when not implementing ICommandTemplate interface properly)
+                if (mapTemplate == null)
+                {
+                    throw new InvalidOperationException(string.Format("Could not load map for type {0}, make sure type maps inherit from ITypeMapTemplate", prop.GetType()));
+                }
+
                 var propval = mapTemplate.Map(pd, prop);
 
                 if (!string.IsNullOrEmpty(propval))
@@ -165,7 +171,7 @@ namespace EpiJsonPlugin
             //Handler found but no instance registered (occurs when not implementing ICommandTemplate interface properly)
             if(cmd == null)
             {
-                throw new InvalidOperationException(string.Format("Could not load handler for command {0}",command));
+                throw new InvalidOperationException(string.Format("Could not load handler for command {0}, make sure commands inherit from ICommandTemplate",command));
             }
 
             //Execute command

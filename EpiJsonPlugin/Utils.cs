@@ -47,7 +47,7 @@ namespace EpiJsonPlugin
             return input;
         }
 
-
+        
         public static double UnixTicks(DateTime dt)
         {
             var d1 = new DateTime(1970, 1, 1);
