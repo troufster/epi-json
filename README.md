@@ -8,6 +8,11 @@ quick and easy way to get EPiServer page instances as JSON.
 
 The hack has since then evolved into this easy to use, yet fully customizable plugin.
 
+DISCLAIMER:
+Please note that although used in production environments, I do not consider this project as production ready. 
+The code does however work, and if you manage to find a scenario where it doesn't, please be kind enough to 
+raise an issue or let me know. 
+
 ***
 ### 1. Installation
 
@@ -17,8 +22,8 @@ The hack has since then evolved into this easy to use, yet fully customizable pl
 
 ### 2. Usage
 
-EPi-JSON comes bundled with 3 basic commands, and capability to serialize any of the default EPiServer types into 
-proper, good looking, sexy JSON.
+EPi-JSON comes bundled with 3 basic commands, and capability to serialize any of the default 
+EPiServer types into proper, good looking, sexy JSON.
 
 To get a page as JSON, simply append ```&json=current``` to the querystring of the page's URL
 
@@ -31,10 +36,14 @@ The following commands are available out of the box:
 
 ### 3. Customization
 
-EPi-JSON is extensible in every single way. Have a custom property you need to serialize? Tired of .NETs ugly JSON?
+EPi-JSON is extensible in every single way. 
+
+Have a custom property you need to serialize? Tired of .NETs ugly JSON? 
 Use a custom property mapper!
 
-Want to declare your own command that only serializes certain properties of pages? No problem good Sir, Use a custom command!
+Want to declare your own command that only serializes certain properties 
+of pages? 
+No problem good Sir, Use a custom command!
 
 #### 3.1 Property mapper
 
