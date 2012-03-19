@@ -1,4 +1,7 @@
-﻿using EPiServer.Core;
+﻿using System;
+using EPiServer.Core;
+using EPiServer.XForms;
+using EpiJsonPlugin;
 
 namespace EpiJsonPlugin.TypeMaps
 {

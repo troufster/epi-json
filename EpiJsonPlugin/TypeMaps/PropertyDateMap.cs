@@ -13,10 +13,18 @@ namespace EpiJsonPlugin.TypeMaps
             if (propertyDate != null)
             {
                 var d = propertyDate.Date;
-                return d != default(DateTime) ? Utils.UnixTicks(d).ToString(CultureInfo.InvariantCulture) : (-1).ToString(CultureInfo.InvariantCulture);
+                return d != default(DateTime) ? UnixTicks(d).ToString(CultureInfo.InvariantCulture) : (-1).ToString(CultureInfo.InvariantCulture);
             }
 
-            return string.Empty;
+            return String.Empty;
+        }
+
+        public static double UnixTicks(DateTime dt)
+        {
+            var d1 = new DateTime(1970, 1, 1);
+            var d2 = dt.ToUniversalTime();
+            var ts = new TimeSpan(d2.Ticks - d1.Ticks);
+            return ts.TotalMilliseconds;
         }
     }
 }
