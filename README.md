@@ -14,13 +14,20 @@ The code does however work, and if you manage to find a scenario where it doesn'
 raise an issue or let me know. 
 
 ***
-### 1. Installation
+### 1. Features
+
+* Proper, good looking JSON. No more __________d wrapping and ugly date objects.
+* Low learning curve, just reference assembly and go
+* Blazing fast. Really. JSON results are cached with dependencies using EPiServer's CacheManager.
+* Fully extensible
+
+### 2. Installation
 
 1. Clone/zipball this repo
 2. Build with EPiServer 6 R2 
 3. Drop assembly into your project
 
-### 2. Usage
+### 3. Usage
 
 EPi-JSON comes bundled with 3 basic commands, and capability to serialize any of the default 
 EPiServer types into proper, good looking, sexy JSON.
@@ -34,7 +41,7 @@ The following commands are available out of the box:
 3. childrenids - get only the id's of the current pages children.
 
 
-### 3. Customization
+### 4. Customization
 
 EPi-JSON is extensible in every single way. 
 
