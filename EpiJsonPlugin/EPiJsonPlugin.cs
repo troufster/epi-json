@@ -159,6 +159,14 @@ namespace EpiJsonPlugin
             //get command
             var command = pb.Request["json"].ToLower();
 
+            //Check cache for page/command compound key
+            var cachedJson = CacheManager.RuntimeCacheGet(CacheKey(pb, command)) as string;
+
+            if(cachedJson != null)
+            {
+                EndJson(pb,cachedJson);
+            }
+
             ICommandTemplate cmd;
 
             //Try to find a handler for provided command
@@ -181,6 +189,8 @@ namespace EpiJsonPlugin
             //Process command result
             var pages = new List<string>();
 
+            
+
             foreach (var page in commandSelection)
             {
                 var dict = new Dictionary<string, string>();
@@ -191,12 +201,28 @@ namespace EpiJsonPlugin
             //If multiple pages, wrap in array
             var json = pages.Count > 1 ? string.Format("[ {0} ]", string.Join(",", pages)) : pages.FirstOrDefault();
 
+            //Cache resultset
+            var dependency = DataFactoryCache.CreateDependency(pb.CurrentPageLink);
+            CacheManager.RuntimeCacheInsert(CacheKey(pb, command), json, dependency);
+
+            EndJson(pb, json);
+        }
+
+        private static void EndJson(PageBase pb, string json)
+        {
             //Return json
             pb.Response.ContentType = "application/json";
             pb.Response.Write(json ?? string.Empty);
 
             pb.Response.End();
         }
+
+
+        private static string CacheKey(PageBase pb, string cmd)
+        {
+            return string.Format("{0}:{1}", pb.CurrentPageLink, cmd);
+        }
     }
+
 
 }
