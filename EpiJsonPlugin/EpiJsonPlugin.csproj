@@ -55,6 +55,7 @@
     <Compile Include="Commands\CurrentPageCommand.cs" />
     <Compile Include="Commands\ICommandTemplate.cs" />
     <Compile Include="EPiJsonPlugin.cs" />
+    <Compile Include="MultipageCacheDependency.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeMaps\PropertyXFormMap.cs" />
     <Compile Include="TypeMaps\PropertyWeekDayMap.cs" />

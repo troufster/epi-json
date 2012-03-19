@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI;
 using EPiServer;
 using EPiServer.PlugIn;
 using EPiServer.Core;
@@ -199,16 +200,17 @@ namespace EpiJsonPlugin
             }
 
             //If multiple pages, wrap in array
-            var json = pages.Count > 1 ? string.Format("[ {0} ]", string.Join(",", pages)) : pages.FirstOrDefault();
+            var multipage = pages.Count > 1;
+            var json = multipage ? string.Format("[ {0} ]", string.Join(",", pages)) : pages.FirstOrDefault();
 
             //Cache resultset
-            var dependency = DataFactoryCache.CreateDependency(pb.CurrentPageLink);
+            var dependency = multipage ? new MultipageCacheDependency(commandSelection) : DataFactoryCache.CreateDependency(pb.CurrentPageLink);
             CacheManager.RuntimeCacheInsert(CacheKey(pb, command), json, dependency);
 
             EndJson(pb, json);
         }
 
-        private static void EndJson(PageBase pb, string json)
+        private static void EndJson(Page pb, string json)
         {
             //Return json
             pb.Response.ContentType = "application/json";
