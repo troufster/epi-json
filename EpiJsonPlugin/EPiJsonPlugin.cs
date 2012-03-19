@@ -204,8 +204,10 @@ namespace EpiJsonPlugin
             var json = multipage ? string.Format("[ {0} ]", string.Join(",", pages)) : pages.FirstOrDefault();
 
             //Cache resultset
-            var dependency = multipage ? new MultipageCacheDependency(commandSelection) : DataFactoryCache.CreateDependency(pb.CurrentPageLink);
-            CacheManager.RuntimeCacheInsert(CacheKey(pb, command), json, dependency);
+            if(json != null) {
+                var dependency = multipage ? new MultipageCacheDependency(commandSelection) : DataFactoryCache.CreateDependency(pb.CurrentPageLink);
+                CacheManager.RuntimeCacheInsert(CacheKey(pb, command), json, dependency);
+            }
 
             EndJson(pb, json);
         }
