@@ -8,7 +8,7 @@ namespace EpiJsonPlugin.TypeMaps
     {
         public string Map(PageData pageData, PropertyData propertyData)
         {
-            return string.Format("\"{0}\"", (propertyData.Value != null).ToString(CultureInfo.InvariantCulture));
+            return string.Format("{0}", (propertyData.Value != null).ToString(CultureInfo.InvariantCulture)).ToLower();
         }
     }
 }
