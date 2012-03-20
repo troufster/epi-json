@@ -3,3 +3,5 @@ EpiJsonPlugin/bin/Debug
 EpiJsonPlugin/bin/Release/*.pdb
 EpiJsonPlugin/obj
 EpiJsonPlugin/EpiJsonPlugin.suo
+
+.DS_Store
