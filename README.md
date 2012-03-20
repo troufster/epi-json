@@ -23,7 +23,7 @@ raise an issue or let me know.
 
 ### 2. Installation
 
-1. Get assembly [here (64bit EPiServer 6 R2)](https://github.com/troufster/epi-json/raw/master/EpiJsonPlugin/bin/Release/EpiJsonPlugin.dll) or Clone/zipball this repo & Build with EPiServer 6 R2 
+1. Get assembly [here (0.7 64bit EPiServer 6 R2)](https://github.com/downloads/troufster/epi-json/EpiJsonPlugin.dll) or Clone/zipball this repo & Build with EPiServer 6 R2 
 2. Drop assembly into your project
 
 ### 3. Usage
