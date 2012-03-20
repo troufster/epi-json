@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.UI;
 using EPiServer;
 using EPiServer.PlugIn;
@@ -16,6 +17,7 @@ namespace EpiJsonPlugin
     [PagePlugIn(DisplayName = "JSON Exporter", Description = "Exports pages as JSON")]
     public class EPiJsonPlugin
     {
+
         private static readonly object Lock = new object();
 
         static EPiJsonPlugin()
@@ -215,6 +217,9 @@ namespace EpiJsonPlugin
         private static void EndJson(Page pb, string json)
         {
             //Return json
+            pb.Response.Cache.SetExpires(DateTime.Now.AddMinutes(5));
+            pb.Response.Cache.SetCacheability(HttpCacheability.ServerAndPrivate);
+            pb.Response.Cache.SetValidUntilExpires(true);
             pb.Response.ContentType = "application/json";
             pb.Response.Write(json ?? string.Empty);
 

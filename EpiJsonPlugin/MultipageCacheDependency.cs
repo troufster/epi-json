@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using EPiServer;
 using EPiServer.Core;
@@ -12,7 +10,7 @@ namespace EpiJsonPlugin
     class MultipageCacheDependency : System.Web.Caching.CacheDependency
     {
         private readonly Timer _timer;
-        private const int POLLTIME = 30000;
+        private const int POLLTIME = 60000;
         private readonly List<Tuple<PageReference, int>> _pageDependencies;  
 
         public MultipageCacheDependency(IEnumerable<PageData> pages)
@@ -24,7 +22,7 @@ namespace EpiJsonPlugin
                 _pageDependencies.Add(Tuple.Create(page.PageLink, page.GetHashCode()));
             }
 
-            _timer = new Timer(new TimerCallback(CheckDependencyCallback), this, 0, POLLTIME);
+            _timer = new Timer(CheckDependencyCallback, this, 0, POLLTIME);
         }
 
         private void CheckDependencyCallback(object sender)
@@ -35,11 +33,24 @@ namespace EpiJsonPlugin
 
                 if (currentPageHash == pageDependency.Item2) continue;
                
-                NotifyDependencyChanged(this, EventArgs.Empty);
-                _timer.Dispose();                   
+                Invalidate();     
                 break;
             }
+
+            var listparent = DataFactory.Instance.GetPage(_pageDependencies.First().Item1).ParentLink;
+            var currcount = DataFactory.Instance.GetChildren(listparent).Count;
             
+            if(_pageDependencies.Count != currcount)
+            {
+                Invalidate();
+            }
+
+        }
+
+        private void Invalidate()
+        {
+            NotifyDependencyChanged(this, EventArgs.Empty);
+            _timer.Dispose();    
         }
     }
 }
