@@ -10,7 +10,7 @@ namespace EpiJsonPlugin
     class MultipageCacheDependency : System.Web.Caching.CacheDependency
     {
         private readonly Timer _timer;
-        private const int POLLTIME = 60000;
+        private const int POLLTIME = 120000;
         private readonly List<Tuple<PageReference, int>> _pageDependencies;  
 
         public MultipageCacheDependency(IEnumerable<PageData> pages)
